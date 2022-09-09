@@ -50,6 +50,8 @@ from Cadastros_menu import Ui_cadastros_menu
 from Cadastros_menu_adicionar import Ui_cadastros_classes
 from Cadastros_adicionar_ficha01 import Ui_cadastros_adicionar_ficha01
 from Usuario_registrado import Ui_Usuario_registrado
+from Menu01Aprendiz import Ui_Menu01Aprendiz
+
 
 from leitor import Ui_leitor
 
@@ -75,26 +77,85 @@ class Connection:
     #Veriica se o usuario esta no banco de dados
     def pesquisar_colaborador(self, idcard):
         print(idcard)
-        self.json_response = requests.get(self.url + 'users/' + idcard).json()
+        self.json_response = requests.get(self.url + 'users/' + idcard)
 
-        print(self.json_response)
-        self.nameColadorador = self.json_response['name']
-        self.idColadorador = str(self.json_response['id'])
-        self.edvColadorador = self.json_response['EDV']
-        self.idCardColadorador = self.json_response['id_card']
+        if (self.json_response.status_code == 500):
+            print('usuário não cadastro')
+            leitor.hide()
+            leitor.show()
+            return 0
+
+        if(self.json_response.status_code==200):
+            print('usuário cadastrado')
+            self.dados_colaborador(self.json_response.json())
+            self.tipo_colaborador(self.json_response.json())
+
+    def dados_colaborador(self, dadosJson):
+        print('----------- Dados Colaborador -----------')
+        print(dadosJson)
+        self.nameColadorador = dadosJson['name']
+        self.idColadorador = str(dadosJson['id'])
+        self.edvColadorador = dadosJson['EDV']
+        self.idCardColadorador = dadosJson['id_card']
         global idGlobal
         idGlobal = self.idColadorador
+        print(self.nameColadorador)
+        print(self.idColadorador)
+        print(self.edvColadorador)
+        print(self.idCardColadorador)
+        print(idGlobal)
 
-        self.json_response = requests.get(self.url + 'apprentices/' + self.idColadorador).json()
-        print('curso:', self.json_response['course']['name'])
-        if(self.json_response['course']['name']!= 'Mecatrônica'):
-            print('não vai entrar')
-            return 'não'
+    def tipo_colaborador(self,dadosJson):
+        #APRENDIZ
+        dadosJson = requests.get(self.url + 'apprentices/' + idGlobal)
 
-        cursor = self.banco.cursor()
-        # self.edv(self.edvColadorador)
+        if(dadosJson.status_code==200):
+            dadosJson = dadosJson.json()
+            print('curso:', dadosJson['course']['name'])
+            if ("Mecatrônica" in dadosJson['course']['name'] or "Manufatura Digital" in dadosJson['course']['name']):
+                print('vai entrar')
 
-        return [self.idColadorador, self.nameColadorador, self.edvColadorador, self.idCardColadorador]
+
+        else:
+            print('não é aprendiz')
+
+        #MEIO OFICIAL
+        dadosJson = requests.get(self.url + 'associates/' + idGlobal)
+
+        if (dadosJson.status_code == 200):
+            dadosJson = dadosJson.json()
+            print('curso:', dadosJson['type']['type'])
+
+            if(dadosJson['type']['type'] == 'Meio Oficial'):
+                print('user meio oficial')
+
+            if(dadosJson['type']['type'] == 'AHK'):
+                print('user AHK')
+
+            if(dadosJson['type']['type'] == 'Gestor'):
+                print('user Gestor')
+
+            if(dadosJson['type']['type'] == 'Instrutor'):
+                print('user Instrutor')
+
+
+
+        # print('tipo:', dadosJson.status_code)
+
+
+        # self.json_response = requests.get(self.url + 'apprentices/' + self.idColadorador).json()
+        # print('curso:', self.json_response['course']['name'])
+        # if("Mecatrônica" in  self.json_response['course']['name']):
+        #     print('vai entrar')
+        #     return [self.idColadorador, self.nameColadorador, self.edvColadorador, self.idCardColadorador]
+        #
+        # else:
+        #     return 'não'
+        #
+        # cursor = self.banco.cursor()
+        # # self.edv(self.edvColadorador)
+        #
+        # return [self.idColadorador, self.nameColadorador, self.edvColadorador, self.idCardColadorador]
 
     def coleta_dados (self):
         cursor = self.banco.cursor()
@@ -231,6 +292,8 @@ class Segundo_Menu(QMainWindow, Ui_Menu02):
         leitor.show()
         Menu02.hide()
 
+
+
 class Liberacao_atencao(QMainWindow, Ui_Atencao):
     def __init__(self):
         super().__init__()
@@ -249,6 +312,19 @@ class Liberacao_atencao(QMainWindow, Ui_Atencao):
         Menu01.show()
         liberacao_atencao.hide()
 
+##################### MENU 01 APRENDIZ ################################
+class Primeiro_MenuAPRENDIZ(QMainWindow, Ui_Menu01Aprendiz):
+    def __init__(self): #FUNÇÃO QUE INICIA A TELA E DECLARA OS BOTÕES,LABELS,ETC.
+        super().__init__() #COMANDO PARA INICIAR A TELA.
+        super().setupUi(self) #COMANDO PARA INICIAR A TELA.
+        self.estado = False
+
+        self.Botao_Liberar_Maquina.clicked.connect(self.liberacao_de_maquina) #DEFINE A FUNÇÃO QUE SERÁ CHAMADA QUANDO O BOTÃO DE LIBERAR A MÁQUINA FOR CLICADO.
+        self.Botao_Interface_Didatica.clicked.connect(self.interface_didatica)
+        self.Botao_Documentos.clicked.connect(self.menu_documentos) #DEFINE A FUNÇÃO QUE SERÁ CHAMADA QUANDO O BOTÃO DE DOCUMENTOS FOR CLICADO.
+        self.Botao_Registros.clicked.connect(self.menu_registros)
+        # self.Label_Colaborador.setText(f"COLABORADOR: {colaborador}") #DEFINE A LABEL COM O NOME DO COLABORADOR.
+        # self.Label_EDV.setText(f"EDV: {edv}") #DEFINE A LABEL COM O EDV DO COLABORADOR.
 
 
 
@@ -424,7 +500,7 @@ class Liberacao_meio_ambiente(QMainWindow, Ui_Liberacao_Meio_Ambiente):
             Menu01.estado = True
 
             data = datetime.today().strftime('%Y-%m-%d')
-            hora = datetime.today().strftime('%H:%M:%S')
+            hora = datetime.today().strftime('%H:%M:%S:%f')
             print('global idGlobal:', idGlobal)
 
             url = 'http://localhost:8000/releasemachines/'
@@ -432,6 +508,7 @@ class Liberacao_meio_ambiente(QMainWindow, Ui_Liberacao_Meio_Ambiente):
             body = [{
                 "date": data,
                 "hour": hora,
+                "hourFinish": None,
                 "idMachineFK": "1",
                 "idAssociateFK": idGlobal
             }]
@@ -444,18 +521,20 @@ class Liberacao_meio_ambiente(QMainWindow, Ui_Liberacao_Meio_Ambiente):
                 if(urlpost.status_code==200):
                     try:
 
-                        urlMachine = 'http://localhost:8000/machines/2/'
+                        urlMachine = 'http://localhost:8000/machines/1/'
 
                         put = {
-                            "name": "teste",
-                            "description": "tesete",
+                            "name": "Serra de Perfil",
+	                        "description": "Serve para realizar diferentes tipos de cortes em materiais metálicos e ela é feita em material resistente capaz de cortar as mais duras placas de aço.",
                             "status": True,
-                            "ipaddress": "12"
+                            "ipaddress": "12",
+                            "ipaddress": "1",
+	                        "statusMaint": False
                         }
 
                         urlPut = requests.put(urlMachine, json=put)
 
-                        print(urlPut.status_code)
+                        print('put', urlPut.status_code)
 
                         if(urlPut.status_code==200):
                             Menu01.Botao_Liberar_Maquina.setIcon(self.img2)
@@ -897,6 +976,7 @@ ap.setStyle("Fusion")
 banco_dados = Connection("Banco.db")
 Menu01 = Primeiro_Menu()
 Menu02 = Segundo_Menu()
+Menu01Aprendiz = Primeiro_MenuAPRENDIZ()
 liberacao_atencao = Liberacao_atencao()
 liberacao_seguranca = Liberacao_seguranca()
 liberacao_meio_ambiente = Liberacao_meio_ambiente()
