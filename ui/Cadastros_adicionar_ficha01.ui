@@ -139,7 +139,7 @@ background-color: rgb(0,136,74);</string>
       <x>70</x>
       <y>60</y>
       <width>631</width>
-      <height>131</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -159,9 +159,9 @@ font: 75 35pt &quot;Bosch Sans Bold&quot;;
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>230</y>
+      <y>190</y>
       <width>631</width>
-      <height>131</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -207,9 +207,9 @@ background-color: rgb(255,207,0);</string>
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>400</y>
+      <y>320</y>
       <width>631</width>
-      <height>131</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -223,6 +223,28 @@ font: 75 35pt &quot;Bosch Sans Bold&quot;;
     </property>
     <property name="text">
      <string>                  EDV</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_idCard">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>450</y>
+      <width>631</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: outset;
+border-color: rgb(0, 0, 0);
+border-width:6px;
+background-color: rgb(193, 194, 204);
+
+font: 75 35pt &quot;Bosch Sans Bold&quot;;
+</string>
+    </property>
+    <property name="text">
+     <string>              ID CARD</string>
     </property>
    </widget>
   </widget>

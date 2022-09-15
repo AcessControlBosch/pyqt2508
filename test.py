@@ -5,10 +5,10 @@ import socket
 def getData():
     # print('hostname:', socket.gethostbyname(socket.gethostname()))
 
-    print(socket.SocketType)
-
-    url = requests.get('http://localhost:8000/users/')
-    print(url)
+    # print(socket.SocketType)
+    #
+    # url = requests.get('http://localhost:8000/users/')
+    # print(url)
     # json_response = dict(url)
     # print(type(json_response))
     # print(json_response['name'])
@@ -77,23 +77,34 @@ def getData():
     # urlPut = requests.put(urlMachine, json=put)
     #
     # print(urlPut.status_code)
+    #
+    # data = datetime.today().strftime('%Y-%m-%d')
+    # hora = datetime.today().strftime('%H:%M:%S:%f')
+    #
+    #
+    # print(data,hora)
+    # url = 'http://localhost:8000/releasemachines/'
+    #
+    # body = [{
+    #     "date": data,
+    #     "hour": hora,
+    #     "hourFinish": None,
+    #     "idMachineFK": "1",
+    #     "idAssociateFK": 4
+    # }]
+    #
+    # urlpost = requests.post(url, json=body)
+    # print(urlpost.status_code)
 
-    data = datetime.today().strftime('%Y-%m-%d')
-    hora = datetime.today().strftime('%H:%M:%S:%f')
+    urlMachine = 'http://192.168.88.108:8000/machines/1/'
 
+    patch2 = {
+        "status": False,
+    }
 
-    print(data,hora)
-    url = 'http://localhost:8000/releasemachines/'
+    urlPut = requests.patch(urlMachine, patch2)
 
-    body = [{
-        "date": data,
-        "hour": hora,
-        "hourFinish": None,
-        "idMachineFK": "1",
-        "idAssociateFK": 4
-    }]
+    print('patch Desl', urlPut)
 
-    urlpost = requests.post(url, json=body)
-    print(urlpost.status_code)
 
 getData()
